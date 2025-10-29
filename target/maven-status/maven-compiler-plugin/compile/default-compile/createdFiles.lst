@@ -1,0 +1,6 @@
+model\CabeceraTicket.class
+model\LineaTicket.class
+model\Camarero.class
+src\main\java\Main.class
+model\Cliente.class
+model\Producto.class

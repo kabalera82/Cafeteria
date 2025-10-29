@@ -1,0 +1,52 @@
+CREATE TABLE Cliente (
+   idCliente CHAR(36) PRIMARY KEY DEFAULT (UUID()), <-- Asignaremos id estilo uuid
+   Nombre VARCHAR(100),
+   Direccion VARCHAR(100),
+   Telefono VARCHAR(15)
+);
+
+CREATE TABLE Camarero (
+   idCamarero INT AUTO_INCREMENT PRIMARY KEY,
+   NIF VARCHAR(20),
+   Nombre VARCHAR(100),
+   FechaIncorporacion DATE
+);
+
+CREATE TABLE CabeceraTicket (
+   NumTicket INT PRIMARY KEY,
+   Fecha DATETIME,
+   Total DECIMAL(10, 2),
+   idCliente INT,
+   idCamarero INT,
+   FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente),
+   FOREIGN KEY (idCamarero) REFERENCES Camarero(idCamarero)
+);
+
+CREATE TABLE LíneaTicket (
+    NumLinea INT,
+    NumTicket INT,
+    Cantidad INT,
+    Subtotal DECIMAL(10, 2),
+    PRIMARY KEY (NumTicket, NumLinea), -- Clave primaria compuesta
+    FOREIGN KEY (NumTicket) REFERENCES CabeceraTicket(NumTicket)
+);
+
+CREATE TABLE EMPRESA (
+	idCliente INT PRIMARY KEY,
+    Descuento DECIMAL(5, 2),
+    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente)
+);
+
+CREATE TABLE PARTICULAR (
+	idCliente INT PRIMARY KEY,
+    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente)
+);
+
+CREATE TABLE EMITE (
+	idCamarero INT,
+    NumTicket INT,
+    Turno VARCHAR(50),
+    PRIMARY KEY (idCamarero , NumTicket),
+    FOREIGN KEY (idCamarero) REFERENCES Camarero(idCamarero),
+    FOREIGN KEY (NumTicket) REFERENCES CabeceraTicket(NumTicket)
+);
