@@ -1,0 +1,162 @@
+CREATE DATABASE IF NOT EXISTS cafeteria;
+USE cafeteria;
+
+-- TABLA BASE DE CLIENTES
+CREATE TABLE cliente (
+    id_cliente CHAR(36) PRIMARY KEY,
+    numero_cliente INT UNIQUE,
+    nombre VARCHAR(100) NOT NULL,
+    primer_apellido VARCHAR(100),
+    segundo_apellido VARCHAR(100),
+    direccion VARCHAR(150),
+    telefono VARCHAR(15),
+    email VARCHAR(100),
+    fecha_alta DATETIME DEFAULT CURRENT_TIMESTAMP,
+    activo BOOLEAN DEFAULT TRUE
+);
+
+-- TABLA EMPRESA (subclase)
+CREATE TABLE empresa (
+    id_cliente CHAR(36) PRIMARY KEY,
+    descuento DECIMAL(5,2) NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- TABLA PARTICULAR (subclase)
+CREATE TABLE particular (
+    id_cliente CHAR(36) PRIMARY KEY,
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+-- TABLA CAMAREROS
+CREATE TABLE camarero (
+    id_camarero INT AUTO_INCREMENT PRIMARY KEY,
+    nif VARCHAR(20) NOT NULL UNIQUE,
+    nombre VARCHAR(50) NOT NULL,
+    fecha_incorporacion DATE NOT NULL,
+    activo BOOLEAN NOT NULL
+);
+
+-- TABLA CABECERA DE TICKET
+CREATE TABLE cabecera_ticket (
+    num_ticket VARCHAR(50) PRIMARY KEY,
+    fecha DATETIME NOT NULL,
+    total DECIMAL(10,2) NOT NULL,
+    id_cliente CHAR(36),
+    id_camarero INT,
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
+    FOREIGN KEY (id_camarero) REFERENCES camarero(id_camarero)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
+);
+
+-- TABLA LÍNEAS DE TICKET
+CREATE TABLE linea_ticket (
+    id_linea INT AUTO_INCREMENT PRIMARY KEY,
+    num_ticket VARCHAR(50) NOT NULL,
+    producto VARCHAR(100) NOT NULL,
+    cantidad INT NOT NULL,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (num_ticket) REFERENCES cabecera_ticket(num_ticket)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+-- TABLA PRODUCTO
+CREATE TABLE producto (
+    id_producto CHAR(36) PRIMARY KEY,
+    descripcion VARCHAR(150) NOT NULL,
+    stock INT NOT NULL,
+    precio DECIMAL(10,2) NOT NULL,
+    fecha_alta DATETIME DEFAULT CURRENT_TIMESTAMP,
+    activo BOOLEAN NOT NULL
+);
+
+USE cafeteria;
+
+-- 🔹 Limpiar todo (por si había residuos)
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE linea_ticket;
+TRUNCATE TABLE cabecera_ticket;
+TRUNCATE TABLE empresa;
+TRUNCATE TABLE particular;
+TRUNCATE TABLE cliente;
+TRUNCATE TABLE camarero;
+TRUNCATE TABLE producto;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- 🔹 1️⃣ Insertar un camarero
+INSERT INTO camarero (nif, nombre, fecha_incorporacion, activo)
+VALUES ('87654321B', 'Laura Gómez', CURDATE(), TRUE);
+
+-- 🔹 2️⃣ Insertar cliente base (en tabla cliente)
+INSERT INTO cliente (
+    id_cliente,
+    numero_cliente,
+    nombre,
+    primer_apellido,
+    segundo_apellido,
+    direccion,
+    telefono,
+    email,
+    fecha_alta,
+    activo
+) VALUES (
+    UUID(),
+    1001,
+    'Cafés del Norte',
+    'S.L.',
+    NULL,
+    'Calle Mayor, 12',
+    '987654321',
+    'contacto@cafesnorte.com',
+    NOW(),
+    TRUE
+);
+
+-- 🔹 3️⃣ Vincular cliente con tabla empresa (herencia)
+-- ⚠️ Usa el mismo UUID del cliente insertado arriba
+-- Para automatizarlo, obtén su id primero:
+-- SELECT id_cliente FROM cliente WHERE nombre='Cafés del Norte';
+-- Y reemplázalo en la siguiente línea ↓
+
+INSERT INTO empresa (id_cliente, descuento)
+VALUES ('<REEMPLAZAR-CON-ID-DEL-CLIENTE>', 12.50);
+
+-- 🔹 4️⃣ Insertar productos
+INSERT INTO producto (id_producto, descripcion, stock, precio, fecha_alta, activo)
+VALUES
+(UUID(), 'Café Solo', 50, 1.20, NOW(), TRUE),
+(UUID(), 'Croissant', 20, 1.80, NOW(), TRUE),
+(UUID(), 'Té Verde', 30, 1.50, NOW(), TRUE);
+
+-- 🔹 5️⃣ Crear ticket (cabecera)
+-- obtén el id_cliente y id_camarero previamente:
+-- SELECT id_cliente FROM cliente WHERE nombre='Cafés del Norte';
+-- SELECT id_camarero FROM camarero WHERE nif='87654321B';
+
+INSERT INTO cabecera_ticket (num_ticket, fecha, total, id_cliente, id_camarero)
+VALUES ('TCK-0001', NOW(), 0.00, '<REEMPLAZAR-ID-CLIENTE>', 1);
+
+-- 🔹 (Opcional) Añadir líneas al ticket
+-- obtén los productos si quieres probar las líneas:
+-- SELECT descripcion, precio FROM producto;
+
+INSERT INTO linea_ticket (num_ticket, producto, cantidad, precio_unitario, subtotal)
+VALUES
+('TCK-0001', 'Café Solo', 2, 1.20, 2.40),
+('TCK-0001', 'Croissant', 1, 1.80, 1.80);
+
+-- 🔹 Actualizar total del ticket
+UPDATE cabecera_ticket
+SET total = (
+    SELECT SUM(subtotal) FROM linea_ticket WHERE num_ticket = 'TCK-0001'
+)
+WHERE num_ticket = 'TCK-0001';

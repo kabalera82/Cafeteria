@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class CabeceraTicket {
 
-    private int numTicket;                  // identificador visible o incremental
+    private String numTicket;                  // identificador visible o incremental
     private LocalDateTime fecha;            // fecha y hora de emisión
     private double total;                   // total del ticket
 
@@ -27,11 +27,11 @@ public class CabeceraTicket {
     }
 
     // Métodos de acceso
-    public int getNumTicket() {
+    public String getNumTicket() {
         return numTicket;
     }
 
-    public void setNumTicket(int numTicket) {
+    public void setNumTicket(String numTicket) {
         this.numTicket = numTicket;
     }
 

@@ -1,9 +1,9 @@
 version: "3.9"
 
 services:
-  mysql:
+  db:
     image: mysql:8.0
-    container_name: cafeteria_mysql
+    container_name: db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -23,7 +23,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
+      - db
 
 volumes:
   mysql_data:

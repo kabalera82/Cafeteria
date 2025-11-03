@@ -38,12 +38,11 @@ public abstract class Cliente {
 
 
     public Cliente(boolean activo, String direccion, String email, LocalDateTime fechaAlta, String idCliente, String nombre, int numeroCliente, String primerApellido, String segundoApellido, String telefono) {
-        this(); // <-- Esto llama al constructor anterior
+        this.idCliente = idCliente != null ? idCliente : UUID.randomUUID().toString();
+        this.fechaAlta = fechaAlta != null ? fechaAlta : LocalDateTime.now();
         this.activo = activo;
         this.direccion = direccion;
         this.email = email;
-        this.fechaAlta = fechaAlta;
-        this.idCliente = idCliente;
         this.nombre = nombre;
         this.numeroCliente = numeroCliente;
         this.primerApellido = primerApellido;
@@ -51,27 +50,86 @@ public abstract class Cliente {
         this.telefono = telefono;
     }
 
-    // Getters & Setters
-    public boolean isActivo() {return activo;}
-    public void setActivo(boolean activo) {this.activo = activo;}
-    public String getDireccion() {return direccion;}
-    public void setDireccion(String direccion) {this.direccion = direccion;}
-    public String getEmail() {return email;}
-    public void setEmail(String email) {this.email = email;}
-    public LocalDateTime getFechaAlta() {return fechaAlta;}
-    public void setFechaAlta(LocalDateTime fechaAlta) {this.fechaAlta = fechaAlta;}
-    public String getIdCliente() {return idCliente;}
-    public void setIdCliente(String idCliente) {this.idCliente = idCliente;}
-    public String getNombre() {return nombre;}
-    public void setNombre(String nombre) {this.nombre = nombre;}
-    public int getNumeroCliente() {return numeroCliente;}
-    public void setNumeroCliente(int numeroCliente) {this.numeroCliente = numeroCliente;}
-    public String getPrimerApellido() {return primerApellido;}
-    public void setPrimerApellido(String primerApellido) {this.primerApellido = primerApellido;}
-    public String getSegundoApellido() {return segundoApellido;}
-    public void setSegundoApellido(String segundoApellido) {this.segundoApellido = segundoApellido;}
-    public String getTelefono() {return telefono;}
-    public void setTelefono(String telefono) {this.telefono = telefono;}
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public LocalDateTime getFechaAlta() {
+        return fechaAlta;
+    }
+
+    public void setFechaAlta(LocalDateTime fechaAlta) {
+        this.fechaAlta = fechaAlta;
+    }
+
+    public String getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(String idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public int getNumeroCliente() {
+        return numeroCliente;
+    }
+
+    public void setNumeroCliente(int numeroCliente) {
+        this.numeroCliente = numeroCliente;
+    }
+
+    public String getPrimerApellido() {
+        return primerApellido;
+    }
+
+    public void setPrimerApellido(String primerApellido) {
+        this.primerApellido = primerApellido;
+    }
+
+    public String getSegundoApellido() {
+        return segundoApellido;
+    }
+
+    public void setSegundoApellido(String segundoApellido) {
+        this.segundoApellido = segundoApellido;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
 
     @Override
     public String toString() {
