@@ -32,6 +32,14 @@ public class Empresa extends Cliente{
         this.descuento = descuento;
     }
 
+    public double getDescuento() {
+        return descuento;
+    }
+
+    public void setDescuento(double descuento) {
+        this.descuento = descuento;
+    }
+
     @Override
     public String toString() {
         return super.toString() + " | Empresa (Descuento: " + descuento + "%)";

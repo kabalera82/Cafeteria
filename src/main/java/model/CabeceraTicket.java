@@ -20,13 +20,13 @@ public class CabeceraTicket {
     private Camarero camarero;              // camarero que atendió
     private List<LineaTicket> lineas;       // lista de productos vendidos
 
-    // 🔹 Constructor por defecto
+    // Constructor por defecto
     public CabeceraTicket() {
         this.fecha = LocalDateTime.now();
         this.lineas = new ArrayList<>();
     }
 
-    // 🔹 Métodos de acceso
+    // Métodos de acceso
     public int getNumTicket() {
         return numTicket;
     }
@@ -89,14 +89,14 @@ public class CabeceraTicket {
 */
     @Override
     public String toString() {
-        return "Ticket{" +
-                "numTicket=" + numTicket +
-                ", fecha=" + fecha +
-                ", total=" + total +
-                ", cliente=" + (cliente != null ? cliente.getNombre() : "Sin cliente") +
-                ", camarero=" + (camarero != null ? camarero.getNombre() : "Sin camarero") +
+        return "Ticket [" +
+                "numTicket:" + numTicket +
+                ", fecha:" + fecha +
+                ", total:" + total +
+                ", cliente:" + (cliente != null ? cliente.getNombre() : "Sin cliente") +
+                ", camarero:" + (camarero != null ? camarero.getNombre() : "Sin camarero") +
                 ", lineas=" + lineas.size() +
-                '}';
+                ']';
     }
 }
 

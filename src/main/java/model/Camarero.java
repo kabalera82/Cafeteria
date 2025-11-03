@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Camarero {
 
@@ -20,10 +21,9 @@ public class Camarero {
         this.activo = true;
     }
 
-    public Camarero(boolean activo, LocalDate fechaIncorporacion, int idCamarero, String nif, String nombre) {
+    public Camarero(boolean activo, LocalDate fechaIncorporacion, String nif, String nombre) {
         this.activo = activo;
         this.fechaIncorporacion = fechaIncorporacion;
-        this.idCamarero = idCamarero;
         this.nif = nif;
         this.nombre = nombre;
     }
@@ -78,4 +78,14 @@ public class Camarero {
                 ", fechaIncorporacion=" + fechaIncorporacion +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Camarero c)) return false;
+        return Objects.equals(nif, c.nif);
+    }
+
+    @Override
+    public int hashCode() { return Objects.hash(nif); }
 }

@@ -11,10 +11,10 @@ public class LineaTicket {
     private int cantidad;         // cantidad vendida
     private double subtotal;      // precio total de esta línea
 
-    // 🔹 Constructor por defecto
+    // Constructor por defecto
     public LineaTicket() {}
 
-    // 🔹 Constructor con datos
+    // Constructor con datos
     public LineaTicket(int numLinea, Producto producto, int cantidad) {
         this.numLinea = numLinea;
         this.producto = producto;
@@ -22,7 +22,7 @@ public class LineaTicket {
         this.subtotal = producto.getPrecio() * cantidad;
     }
 
-    // 🔹 Getters y Setters
+    // Getters y Setters
     public int getNumLinea() {
         return numLinea;
     }
