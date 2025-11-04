@@ -4,7 +4,7 @@ USE cafeteria;
 -- TABLA BASE DE CLIENTES
 CREATE TABLE cliente (
     id_cliente CHAR(36) PRIMARY KEY,
-    numero_cliente INT UNIQUE,
+    numero_cliente INT AUTOINCREMENT UNIQUE,
     nombre VARCHAR(100) NOT NULL,
     primer_apellido VARCHAR(100),
     segundo_apellido VARCHAR(100),

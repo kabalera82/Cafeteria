@@ -1,108 +1,73 @@
-import connection.ConnectionDB;
-import dao.*;
-import model.*;
+package app;
 
-import java.sql.Connection;
+import dao.ProductoDao;
+import model.Producto;
+
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        try {
-            // 1️⃣ Verificar conexión
-            Connection con = ConnectionDB.getConnection();
-            try (Statement st = con.createStatement()) {
-                st.executeUpdate("DELETE FROM cabecera_ticket");
-                st.executeUpdate("DELETE FROM linea_ticket");
-                st.executeUpdate("DELETE FROM camarero");
-                st.executeUpdate("DELETE FROM empresa");
-                st.executeUpdate("DELETE FROM cliente");
-                System.out.println("🧹 Tablas limpiadas antes de insertar nuevos datos.");
+        Scanner sc = new Scanner(System.in);
+        ProductoDao productoDao = new ProductoDao();
+
+        while (true) {
+            System.out.println("\n====== MENÚ PRINCIPAL ======");
+            System.out.println("1. Insertar producto");
+            System.out.println("2. Actualizar producto");
+            System.out.println("3. Eliminar producto");
+            System.out.println("4. Salir");
+            System.out.print("Selecciona una opción: ");
+            int opcion = sc.nextInt();
+            sc.nextLine(); // limpiar salto de línea
+
+            try {
+                switch (opcion) {
+                    case 1 -> {
+                        Producto nuevo = new Producto();
+                        System.out.print("Descripción: ");
+                        nuevo.setDescripcion(sc.nextLine());
+                        System.out.print("Stock: ");
+                        nuevo.setStock(sc.nextInt());
+                        System.out.print("Precio: ");
+                        nuevo.setPrecio(sc.nextDouble());
+                        nuevo.setFechaAlta(LocalDateTime.now());
+                        nuevo.setActivo(true);
+                        productoDao.create(nuevo);
+                    }
+                    case 2 -> {
+                        Producto actualizar = new Producto();
+                        System.out.print("ID del producto a actualizar: ");
+                        actualizar.setIdProducto(sc.nextLine());
+                        System.out.print("Nueva descripción: ");
+                        actualizar.setDescripcion(sc.nextLine());
+                        System.out.print("Nuevo stock: ");
+                        actualizar.setStock(sc.nextInt());
+                        System.out.print("Nuevo precio: ");
+                        actualizar.setPrecio(sc.nextDouble());
+                        actualizar.setFechaAlta(LocalDateTime.now());
+                        actualizar.setActivo(true);
+                        productoDao.update(actualizar);
+                    }
+                    case 3 -> {
+                        Producto eliminar = new Producto();
+                        System.out.print("ID del producto a eliminar: ");
+                        eliminar.setIdProducto(sc.nextLine());
+                        productoDao.delete(eliminar);
+                    }
+                    case 4 -> {
+                        System.out.println("Saliendo del programa...");
+                        sc.close();
+                        return;
+                    }
+                    default -> System.out.println("Opción no válida.");
+                }
+            } catch (SQLException e) {
+                System.out.println("❌ Error en la operación: " + e.getMessage());
             }
-
-            if (con != null) System.out.println("🎯 Conexión verificada y lista para usarse.");
-
-            // 2️⃣ Crear camarero
-            Camarero camarero = new Camarero(true, LocalDate.now(), "55555555Z", "Juan López");
-            CamareroDao camareroDao = new CamareroDao();
-            camareroDao.create(camarero);
-            System.out.println("✅ Camarero insertado: " + camarero);
-
-            // 3️⃣ Crear cliente tipo Empresa
-            Empresa empresa = new Empresa();
-            empresa.setNumeroCliente(2001);
-            empresa.setNombre("Distribuciones Atlas");
-            empresa.setPrimerApellido("S.L.");
-            empresa.setDireccion("Avenida del Comercio, 45");
-            empresa.setTelefono("912345678");
-            empresa.setEmail("info@atlas.com");
-            empresa.setDescuento(5.0);
-
-            EmpresaDao empresaDao = new EmpresaDao();
-            empresaDao.create(empresa);
-            System.out.println("✅ Empresa insertada: " + empresa);
-
-            // 4️⃣ Crear productos
-            ProductoDao productoDao = new ProductoDao();
-
-            Producto cafe = new Producto("Café Solo", 100, 1.20);
-            Producto croissant = new Producto("Croissant", 50, 1.80);
-            Producto zumo = new Producto("Zumo de Naranja", 40, 2.00);
-
-            productoDao.create(cafe);
-            productoDao.create(croissant);
-            productoDao.create(zumo);
-            System.out.println("✅ Productos insertados correctamente.");
-
-            // 5️⃣ Crear cabecera del ticket
-            CabeceraTicket ticket = new CabeceraTicket();
-            ticket.setNumTicket("TCK-0002");
-            ticket.setCliente(empresa);
-            ticket.setCamarero(camarero);
-
-            // 6️⃣ Crear líneas del ticket
-            LineaTicket linea1 = new LineaTicket(1, cafe, 2);       // 2 cafés
-            LineaTicket linea2 = new LineaTicket(2, croissant, 1);  // 1 croissant
-            LineaTicket linea3 = new LineaTicket(3, zumo, 1);       // 1 zumo
-
-            ticket.getLineas().add(linea1);
-            ticket.getLineas().add(linea2);
-            ticket.getLineas().add(linea3);
-
-            // 7️⃣ Calcular total (sumando subtotales)
-            double total = 0.0;
-            for (LineaTicket linea : ticket.getLineas()) {
-                total += linea.getSubtotal();
-            }
-            ticket.setTotal(total);
-
-            // 8️⃣ Insertar cabecera
-            CabeceraTicketDao cabeceraDao = new CabeceraTicketDao();
-            cabeceraDao.create(ticket);
-            System.out.println("✅ Ticket insertado: " + ticket);
-
-            // 9️⃣ Insertar líneas asociadas
-            LineaTicketDAO lineaDao = new LineaTicketDAO();
-            for (LineaTicket linea : ticket.getLineas()) {
-                lineaDao.create(linea, ticket.getNumTicket());
-            }
-            System.out.println("✅ Líneas del ticket insertadas correctamente.");
-
-            // 10️⃣ Mostrar resumen
-            System.out.println("\n🧾 RESUMEN TICKET:");
-            System.out.println(ticket);
-            for (LineaTicket l : ticket.getLineas()) {
-                System.out.println("   → " + l);
-            }
-            System.out.printf("💰 TOTAL FINAL: %.2f €%n", total);
-
-        } catch (SQLException e) {
-            System.out.println("❌ Error SQL: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("⚠️ Error inesperado: " + e.getMessage());
         }
     }
 }

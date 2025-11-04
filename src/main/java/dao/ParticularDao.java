@@ -1,7 +1,7 @@
 package dao;
 
+import connection.ConnectionDB;
 import model.Particular;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -9,10 +9,7 @@ public class ParticularDao extends ClienteDao {
 
     public void create(Particular particular) throws SQLException {
         try {
-            // 1️⃣ Inserta primero en la tabla cliente
             super.create(particular);
-
-            // 2️⃣ Inserta después en la tabla particular
             String sql = "INSERT INTO particular (id_cliente) VALUES (?)";
 
             try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -26,4 +23,7 @@ public class ParticularDao extends ClienteDao {
             throw e;
         }
     }
+
+    // No se incluye update() porque id_cliente no debe modificarse
+    // Tampoco se necesita delete() aquí; se elimina desde ClienteDao
 }
