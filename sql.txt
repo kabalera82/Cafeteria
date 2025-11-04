@@ -4,7 +4,7 @@ USE cafeteria;
 -- TABLA BASE DE CLIENTES
 CREATE TABLE cliente (
     id_cliente CHAR(36) PRIMARY KEY,
-    numero_cliente INT AUTOINCREMENT UNIQUE,
+    numero_cliente INT AUTO_INCREMENT UNIQUE,
     nombre VARCHAR(100) NOT NULL,
     primer_apellido VARCHAR(100),
     segundo_apellido VARCHAR(100),
@@ -79,9 +79,10 @@ CREATE TABLE producto (
     activo BOOLEAN NOT NULL
 );
 
+
 USE cafeteria;
 
--- 🔹 Limpiar todo (por si había residuos)
+-- Limpiar tablas
 SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE linea_ticket;
 TRUNCATE TABLE cabecera_ticket;
@@ -92,69 +93,56 @@ TRUNCATE TABLE camarero;
 TRUNCATE TABLE producto;
 SET FOREIGN_KEY_CHECKS = 1;
 
--- 🔹 1️⃣ Insertar un camarero
+-- Variables para IDs (simulación de obtención automática o manual)
+SET @uuid_cliente = UUID();
+SET @id_camarero = (SELECT id_camarero FROM camarero WHERE nif = '87654321B');
+SET @id_cliente_empresa = (SELECT id_cliente FROM cliente WHERE nombre = 'Cafés del Norte');
+
+-- Insertar un camarero
 INSERT INTO camarero (nif, nombre, fecha_incorporacion, activo)
 VALUES ('87654321B', 'Laura Gómez', CURDATE(), TRUE);
 
--- 🔹 2️⃣ Insertar cliente base (en tabla cliente)
+-- Insertar cliente base (Empresa)
 INSERT INTO cliente (
     id_cliente,
-    numero_cliente,
     nombre,
     primer_apellido,
     segundo_apellido,
     direccion,
     telefono,
-    email,
-    fecha_alta,
-    activo
+    email
 ) VALUES (
-    UUID(),
-    1001,
+    @uuid_cliente,
     'Cafés del Norte',
     'S.L.',
     NULL,
     'Calle Mayor, 12',
     '987654321',
-    'contacto@cafesnorte.com',
-    NOW(),
-    TRUE
+    'contacto@cafesnorte.com'
 );
 
--- 🔹 3️⃣ Vincular cliente con tabla empresa (herencia)
--- ⚠️ Usa el mismo UUID del cliente insertado arriba
--- Para automatizarlo, obtén su id primero:
--- SELECT id_cliente FROM cliente WHERE nombre='Cafés del Norte';
--- Y reemplázalo en la siguiente línea ↓
-
+-- Vincular cliente con tabla empresa (Herencia)
 INSERT INTO empresa (id_cliente, descuento)
-VALUES ('<REEMPLAZAR-CON-ID-DEL-CLIENTE>', 12.50);
+VALUES (@uuid_cliente, 12.50);
 
--- 🔹 4️⃣ Insertar productos
+-- Insertar productos
 INSERT INTO producto (id_producto, descripcion, stock, precio, fecha_alta, activo)
 VALUES
 (UUID(), 'Café Solo', 50, 1.20, NOW(), TRUE),
 (UUID(), 'Croissant', 20, 1.80, NOW(), TRUE),
 (UUID(), 'Té Verde', 30, 1.50, NOW(), TRUE);
 
--- 🔹 5️⃣ Crear ticket (cabecera)
--- obtén el id_cliente y id_camarero previamente:
--- SELECT id_cliente FROM cliente WHERE nombre='Cafés del Norte';
--- SELECT id_camarero FROM camarero WHERE nif='87654321B';
-
+-- Crear ticket (Cabecera) - Se asume id_camarero = 1 si es la primera inserción
 INSERT INTO cabecera_ticket (num_ticket, fecha, total, id_cliente, id_camarero)
-VALUES ('TCK-0001', NOW(), 0.00, '<REEMPLAZAR-ID-CLIENTE>', 1);
+VALUES ('TCK-0001', NOW(), 0.00, @uuid_cliente, 1);
 
--- 🔹 (Opcional) Añadir líneas al ticket
--- obtén los productos si quieres probar las líneas:
--- SELECT descripcion, precio FROM producto;
-
+-- Añadir líneas al ticket
 INSERT INTO linea_ticket (num_ticket, producto, cantidad, precio_unitario, subtotal)
 VALUES
 ('TCK-0001', 'Café Solo', 2, 1.20, 2.40),
 ('TCK-0001', 'Croissant', 1, 1.80, 1.80);
 
--- 🔹 Actualizar total del ticket
+-- Actualizar total del ticket
 UPDATE cabecera_ticket
 SET total = (
     SELECT SUM(subtotal) FROM linea_ticket WHERE num_ticket = 'TCK-0001'
