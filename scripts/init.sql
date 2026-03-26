@@ -41,6 +41,16 @@ CREATE TABLE camarero (
     activo BOOLEAN NOT NULL
 );
 
+-- TABLA PRODUCTO
+CREATE TABLE producto (
+    id_producto CHAR(36) PRIMARY KEY,
+    descripcion VARCHAR(150) NOT NULL,
+    stock INT NOT NULL,
+    precio DECIMAL(10,2) NOT NULL,
+    fecha_alta DATETIME DEFAULT CURRENT_TIMESTAMP,
+    activo BOOLEAN NOT NULL
+);
+
 -- TABLA CABECERA DE TICKET
 CREATE TABLE cabecera_ticket (
     num_ticket VARCHAR(50) PRIMARY KEY,
@@ -60,21 +70,14 @@ CREATE TABLE cabecera_ticket (
 CREATE TABLE linea_ticket (
     id_linea INT AUTO_INCREMENT PRIMARY KEY,
     num_ticket VARCHAR(50) NOT NULL,
-    producto VARCHAR(100) NOT NULL,
+    id_producto CHAR(36) NOT NULL,
     cantidad INT NOT NULL,
     precio_unitario DECIMAL(10,2) NOT NULL,
     subtotal DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (num_ticket) REFERENCES cabecera_ticket(num_ticket)
         ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
-
--- TABLA PRODUCTO
-CREATE TABLE producto (
-    id_producto CHAR(36) PRIMARY KEY,
-    descripcion VARCHAR(150) NOT NULL,
-    stock INT NOT NULL,
-    precio DECIMAL(10,2) NOT NULL,
-    fecha_alta DATETIME DEFAULT CURRENT_TIMESTAMP,
-    activo BOOLEAN NOT NULL
+        ON DELETE CASCADE,
+    FOREIGN KEY (id_producto) REFERENCES producto(id_producto)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 );
